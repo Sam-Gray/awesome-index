@@ -84,6 +84,11 @@
     <script>
         let people = [];
 
+        // Function to load saved data from localStorage when page loads
+        window.onload = function() {
+            loadData();
+        };
+
         // Function to add a person
         function addPerson() {
             const name = document.getElementById('name').value;
@@ -93,12 +98,14 @@
                 const person = { name, awesomePoints: Number(awesomePoints) };
                 people.push(person);
                 updateTable();
-                saveData();
+                saveData();  // Save the updated list to localStorage
                 clearForm();
+            } else {
+                alert("Please enter both name and awesome points.");
             }
         }
 
-        // Function to update the table
+        // Function to update the table display
         function updateTable() {
             const tbody = document.querySelector('#awesome-table tbody');
             tbody.innerHTML = '';
@@ -123,40 +130,35 @@
             if (newPoints !== null) {
                 people[index].awesomePoints = Number(newPoints);
                 updateTable();
-                saveData();
+                saveData();  // Save changes to localStorage
             }
         }
 
         // Function to delete a person
         function deletePerson(index) {
-            people.splice(index, 1);
+            people.splice(index, 1);  // Remove the person from the array
             updateTable();
-            saveData();
+            saveData();  // Save the updated list to localStorage
         }
 
-        // Save data to localStorage
+        // Function to save the current list of people to localStorage
         function saveData() {
             localStorage.setItem('people', JSON.stringify(people));
         }
 
-        // Load data from localStorage
+        // Function to load the data from localStorage when the page is reloaded
         function loadData() {
             const storedPeople = localStorage.getItem('people');
             if (storedPeople) {
-                people = JSON.parse(storedPeople);
-                updateTable();
+                people = JSON.parse(storedPeople);  // Load the saved people data
+                updateTable();  // Update the table to display loaded data
             }
         }
 
-        // Clear input form
+        // Function to clear the input form after adding a person
         function clearForm() {
             document.getElementById('name').value = '';
             document.getElementById('awesome-points').value = '';
-        }
-
-        // Initialize data on page load
-        window.onload = function() {
-            loadData();
         }
     </script>
 
