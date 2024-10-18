@@ -15,6 +15,28 @@
             text-align: center;
             color: #333;
         }
+        #awesome-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -25,47 +47,132 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-        th {
-            background-color: #f2f2f2;
+        .actions button {
+            margin-right: 5px;
+            background-color: #f44336;
         }
-        .name {
-            width: 50%;
+        .edit-button {
+            background-color: #2196F3;
         }
-        .points {
-            width: 30%;
+        .actions button:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
     <h1>The Awesome Index</h1>
+    
+    <div id="awesome-form">
+        <input type="text" id="name" placeholder="Enter name" required>
+        <input type="number" id="awesome-points" placeholder="Enter awesome points" required>
+        <button onclick="addPerson()">Add Person</button>
+    </div>
 
-    <table>
+    <table id="awesome-table">
         <thead>
             <tr>
-                <th class="name">Name</th>
-                <th class="points">Awesome Points</th>
+                <th>Name</th>
+                <th>Awesome Points</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Existing entries -->
-            <tr>
-                <td>Sam Gray</td>
-                <td>∞</td>
-            </tr>
-            <tr>
-            
-            <!-- Add more entries as needed -->
-
-            <!-- Template for new entry -->
-            <!-- 
-            <tr>
-                <td>New Name</td>
-                <td>Awesome Points</td>
-            </tr>
-            -->
         </tbody>
     </table>
+
+    <script>
+        let people = [];
+
+        // Load data from localStorage when the page loads
+        window.onload = function() {
+            loadData();
+        };
+
+        // Function to add a person
+        function addPerson() {
+            const name = document.getElementById('name').value.trim(); // Trim whitespace
+            const awesomePoints = document.getElementById('awesome-points').value.trim();
+
+            // Ensure both fields are filled
+            if (name && awesomePoints) {
+                const person = { name, awesomePoints: Number(awesomePoints) };
+                people.push(person);  // Add new person to the array
+                updateTable();  // Update the table display
+                saveData();  // Save the updated list to localStorage
+                clearForm();  // Clear the input fields
+            } else {
+                alert("Please enter both name and awesome points.");
+            }
+        }
+
+        // Function to update the table display
+        function updateTable() {
+            const tbody = document.querySelector('#awesome-table tbody');
+            tbody.innerHTML = '';  // Clear existing rows
+
+            people.forEach((person, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${person.name}</td>
+                    <td>${person.awesomePoints}</td>
+                    <td class="actions">
+                        <button class="edit-button" onclick="editPerson(${index})">Edit</button>
+                        <button onclick="deletePerson(${index})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Function to edit a person's awesome points
+        function editPerson(index) {
+            const newPoints = prompt("Enter new awesome points:", people[index].awesomePoints);
+            if (newPoints !== null) {
+                people[index].awesomePoints = Number(newPoints);  // Update points
+                updateTable();  // Re-render the table
+                saveData();  // Save changes to localStorage
+            }
+        }
+
+        // Function to delete a person
+        function deletePerson(index) {
+            people.splice(index, 1);  // Remove person from the array
+            updateTable();  // Re-render the table
+            saveData();  // Save the updated list to localStorage
+        }
+
+        // Function to save the current list of people to localStorage
+        function saveData() {
+            try {
+                // Convert the people array to a JSON string and store it in localStorage
+                localStorage.setItem('people', JSON.stringify(people));
+                console.log('Data saved successfully:', people);  // Log success
+            } catch (error) {
+                console.error('Error saving data to localStorage:', error);  // Log error
+            }
+        }
+
+        // Function to load the data from localStorage on page load
+        function loadData() {
+            try {
+                const storedPeople = localStorage.getItem('people');
+                if (storedPeople) {
+                    people = JSON.parse(storedPeople);  // Parse the stored JSON string back into an array
+                    updateTable();  // Display the stored people in the table
+                    console.log('Data loaded successfully:', people);  // Log success
+                }
+            } catch (error) {
+                console.error('Error loading data from localStorage:', error);  // Log error
+            }
+        }
+
+        // Function to clear the input form after adding a person
+        function clearForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('awesome-points').value = '';
+        }
+    </script>
 
 </body>
 </html>
